@@ -1,0 +1,203 @@
+#!/bin/bash
+###############AOKP##################
+#    ______    ______   __    __  _______  
+#   /      \  /      \ /  |  /  |/       \ 
+#  /$$$$$$  |/$$$$$$  |$$ | /$$/ $$$$$$$  |
+#  $$ |__$$ |$$ |  $$ |$$ |/$$/  $$ |__$$ |
+#  $$    $$ |$$ |  $$ |$$  $$<   $$    $$/ 
+#  $$$$$$$$ |$$ |  $$ |$$$$$  \  $$$$$$$/  
+#  $$ |  $$ |$$ \__$$ |$$ |$$  \ $$ |      
+#  $$ |  $$ |$$    $$/ $$ | $$  |$$ |      
+#  $$/   $$/  $$$$$$/  $$/   $$/ $$/
+#  Compile and Install Bash Script
+#			made by Leandros     
+#####################################
+
+##### The path where you want to save the AOKP source (you need about 20 GB free memory) ######
+AOKP_REPO_DIR="/home/leandros/aokp_jb-mr1"
+
+##### The name of the AOKP Repo Dir ######
+AOKP_REPO_DIR_NAME="aokp_jb-mr1"
+
+##### The path to the repo binary #####
+BIN_DIR="/home/leandros/bin"
+
+##### Your device or the device which will run AOKP #####
+#DEVICE="maguro"
+DEVICE="mako"
+
+##### Where the script is on your pc located #####
+AOKP_SCRIPT_PATH="/home/leandros/bin"
+
+##### How much threads from your processor should be used #####
+CORES="4"
+
+##### Your common used user #####
+MY_USER="leandros"
+
+#### The group of your user ####
+MY_GROUP="users"
+
+
+
+
+#    ____                          _            _                                
+#   |  _ \   ___     _ __    ___  | |_     ___ | |__    __ _  _ __    __ _   ___ 
+#   | | | | / _ \   | '_ \  / _ \ | __|   / __|| '_ \  / _` || '_ \  / _` | / _ \
+#   | |_| || (_) |  | | | || (_) || |_   | (__ | | | || (_| || | | || (_| ||  __/
+#   |____/  \___/   |_| |_| \___/  \__|   \___||_| |_| \__,_||_| |_| \__, | \___|
+#                                                                    |___/             
+#                                 _    _      _                  _            _                    _    _      _         _  _              
+#    ___   ___   _ __ ___    ___ | |_ | |__  (_) _ __    __ _   | |__    ___ | |  ___ __      __  | |_ | |__  (_) ___   | |(_) _ __    ___ 
+#   / __| / _ \ | '_ ` _ \  / _ \| __|| '_ \ | || '_ \  / _` |  | '_ \  / _ \| | / _ \\ \ /\ / /  | __|| '_ \ | |/ __|  | || || '_ \  / _ \
+#   \__ \| (_) || | | | | ||  __/| |_ | | | || || | | || (_| |  | |_) ||  __/| || (_) |\ V  V /   | |_ | | | || |\__ \  | || || | | ||  __/
+#   |___/ \___/ |_| |_| |_| \___| \__||_| |_||_||_| |_| \__, |  |_.__/  \___||_| \___/  \_/\_/     \__||_| |_||_||___/  |_||_||_| |_| \___|
+#                                                       |___/                                                                           
+##################################### DO NOT CHANGE SOMETHING BELOW THIS LINE!!! ############################
+
+if [ ${1:-0} = "-help" -o ${1:-0} = "-h" -o ${1:-0} = "--help" ]
+then
+	echo "usage: aokp <command>"
+	echo "   "
+	echo "Commands: "
+	echo "[--help/-help/-h] [install] [sync] [build] [full-eng] [build-nightly] [sync-nightly] [clean] [path] [path_script]"
+	echo " "
+	echo "Command help:"
+	echo "============="
+	echo "install: will install AOKP to given paths (modify in this file)."
+	echo "sync: sync the repo with AOKP remote repo"
+	echo "build: build a normal debug build"
+	echo "full-eng: will build a normal full debug build. ONLY FOR DEBUGGING!"
+	echo "build-nightly: start a nightly build, will shutdown after completion"
+	echo "sync-nightly: syncs and shutdown afterwards"
+	echo "clean: cleans everything from earlier builds up"
+	echo "path: write the path to $BIN_DIR permanent into ~/.bashrc (restart terminal to see effect)"
+	echo "path_script: write the path to this script into ~/.bashrc"
+	exit
+fi
+
+if [ ${1:-0} = "chown" ]
+then
+    cd $AOKP_REPO_DIR
+    cd ..
+    sudo chown -R $MY_USER:$MY_GROUP $AOKP_REPO_DIR_NAME
+	exit
+fi
+
+if [ ${1:-0} = "build-nightly" ]
+then
+    cd $AOKP_REPO_DIR && . build/envsetup.sh && (time brunch $DEVICE) 2> buildtime.txt
+    cd $AOKP_REPO_DIR
+    cd ..
+    sudo chown -R $MY_USER:$MY_GROUP $AOKP_REPO_DIR_NAME
+    echo "Shutdown in 1 minute!"
+	sudo shutdown -P 1
+	exit
+fi
+
+if [ ${1:-0} = "sync-nightly" ]
+then
+    cd $AOKP_REPO_DIR && repo sync
+    cd $AOKP_REPO_DIR
+    cd ..
+    sudo chown -R $MY_USER:$MY_GROUP $AOKP_REPO_DIR_NAME
+    echo "Shutdown in 1 minute!"
+	sudo shutdown -P 1
+	exit
+fi
+
+if [ ${1:-0} = "build" ]
+then
+	cd $AOKP_REPO_DIR && . build/envsetup.sh && time brunch $DEVICE
+	exit
+fi
+
+if [ ${1:-0} = "-full-eng" ]
+then
+	cd $AOKP_REPO_DIR && . build/envsetup.sh && lunch full-eng && (time make -j$CORES) 2> buildtime-full-eng.txt
+	cd $AOKP_REPO_DIR
+    cd ..
+    sudo chown -R $MY_USER:$MY_USER $AOKP_REPO_DIR_NAME
+	echo "Shutdown in 1 minute!"
+	sudo shutdown -h 1
+	exit
+fi
+
+if [ ${1:-0} = "clean" ]
+then
+	cd $AOKP_REPO_DIR && make clean && make clobber
+	exit
+fi
+
+if [ ${1:-0} = "install" ]
+then
+	sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl libc6-dev libncurses5-dev:i386 x11proto-core-dev libx11-dev:i386 libreadline6-dev:i386 libgl1-mesa-glx:i386 libgl1-mesa-dev g++-multilib mingw32 openjdk-6-jdk tofrodos python-markdown libxml2-utils xsltproc zlib1g-dev:i386
+	sudo ln -s /usr/lib/i386-linux-gnu/mesa/libGL.so.1 /usr/lib/i386-linux-gnu/libGL.so
+	cd ~
+	mkdir $BIN_DIR
+	PATH=$BIN_DIR:$PATH
+	curl https://dl-ssl.google.com/dl/googlesource/git-repo/repo > $BIN_DIR/repo
+	chmod a+x $BIN_DIR/repo
+	mkdir $AOKP_REPO_DIR
+	cd $AOKP_REPO_DIR
+	repo init -u git://github.com/AOKP/platform_manifest.git -b jb
+	exit
+fi
+
+if [ ${1:-0} = "-sync" ]
+then
+	PATH=$BIN_DIR:$PATH
+	cd $AOKP_REPO_DIR
+	repo sync
+	exit
+fi
+
+if [ ${1:-0} = "path" ]
+then
+	if [ -r ~/.bashrc ]; then
+		echo "PATH=$PATH:$AOKP_SCRIPT_PATH" >> ~/.bashrc
+		echo "export PATH" >> ~/.bashrc
+		echo "Please close terminal window to see effect"
+		exit
+	elif [ -f ~/.bashrc ]; then
+		echo "The file '~/.bashrc' exists but is not readable to the script."
+		exit
+	else
+		echo "The file '~/.bashrc' does not exist. The file will be created now."
+		touch ~/.bashrc
+		echo "PATH=$PATH:$AOKP_SCRIPT_PATH" >> ~/.bashrc
+		echo "export PATH" >> ~/.bashrc
+		echo "Please close terminal window to see effect"
+		exit
+	fi
+	exit
+fi
+
+if [ ${1:-0} = "path_script" ]
+then
+	if [ -r ~/.bashrc ]; then
+		echo "PATH=$PATH:$BIN_DIR" >> ~/.bashrc
+		echo "export PATH" >> ~/.bashrc
+		echo "Please close terminal window to see effect"
+		exit
+	elif [ -f ~/.bashrc ]; then
+		echo "The file '~/.bashrc' exists but is not readable to the script."
+		exit
+	else
+		echo "The file '~/.bashrc' does not exist. The file will be created now."
+		touch ~/.bashrc
+		echo "PATH=$PATH:$BIN_DIR" >> ~/.bashrc
+		echo "export PATH" >> ~/.bashrc
+		echo "Please close terminal window to see effect"
+		exit
+	fi
+	exit
+fi
+
+
+echo "aokp: '$1' is not a valid command. See 'aokp --help'."
+
+
+############ Ignore :) ###################
+#cd ~/aokp_jb && . build/envsetup.sh && lunch aokp_maguro-userdebug && make otapackage -j8
+#cd ~/aokp_jb && make clean && . build/envsetup.sh && ~/bin/time -o buildtime.txt bash -c " brunch maguro ;"
