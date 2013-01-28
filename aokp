@@ -86,6 +86,10 @@ fi
 
 if [ ${1:-0} = "build-nightly" ]
 then
+    if [[ $EUID -ne 0 ]]; then
+        echo "The command must be run as root" 1>&2
+    exit 1
+    fi
     cd $AOKP_REPO_DIR && . build/envsetup.sh && (time brunch $DEVICE) 2> buildtime.txt
     cd $AOKP_REPO_DIR
     cd ..
@@ -97,6 +101,10 @@ fi
 
 if [ ${1:-0} = "sync-nightly" ]
 then
+    if [[ $EUID -ne 0 ]]; then
+        echo "The command must be run as root" 1>&2
+    exit 1
+    fi
     cd $AOKP_REPO_DIR && repo sync
     cd $AOKP_REPO_DIR
     cd ..
