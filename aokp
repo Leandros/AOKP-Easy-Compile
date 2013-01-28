@@ -90,7 +90,7 @@ then
         echo "The command must be run as root" 1>&2
     exit 1
     fi
-    cd $AOKP_REPO_DIR && . build/envsetup.sh && (time brunch $DEVICE) 2> buildtime.txt
+    cd $AOKP_REPO_DIR && sudo -u $MY_USER . build/envsetup.sh && (time brunch $DEVICE) 2> buildtime.txt
     cd $AOKP_REPO_DIR
     cd ..
     sudo chown -R $MY_USER:$MY_GROUP $AOKP_REPO_DIR_NAME
@@ -105,7 +105,7 @@ then
         echo "The command must be run as root" 1>&2
     exit 1
     fi
-    cd $AOKP_REPO_DIR && repo sync
+    cd $AOKP_REPO_DIR && sudo -u $MY_USER repo sync
     cd $AOKP_REPO_DIR
     cd ..
     sudo chown -R $MY_USER:$MY_GROUP $AOKP_REPO_DIR_NAME
