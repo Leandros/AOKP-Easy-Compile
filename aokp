@@ -140,7 +140,7 @@ then
 	chmod a+x $BIN_DIR/repo
 	mkdir $AOKP_REPO_DIR
 	cd $AOKP_REPO_DIR
-	repo init -u git://github.com/AOKP/platform_manifest.git -b jb
+	repo init -u git://github.com/AOKP/platform_manifest.git -b jb-mr1
 	exit
 fi
 
