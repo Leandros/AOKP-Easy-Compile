@@ -120,7 +120,7 @@ then
 	exit
 fi
 
-if [ ${1:-0} = "-full-eng" ]
+if [ ${1:-0} = "full-eng" ]
 then
 	cd $AOKP_REPO_DIR && . build/envsetup.sh && lunch full-eng && (time make -j$CORES) 2> buildtime-full-eng.txt
 	cd $AOKP_REPO_DIR
@@ -152,7 +152,7 @@ then
 	exit
 fi
 
-if [ ${1:-0} = "-sync" ]
+if [ ${1:-0} = "sync" ]
 then
 	PATH=$BIN_DIR:$PATH
 	cd $AOKP_REPO_DIR
